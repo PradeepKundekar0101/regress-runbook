@@ -1,8 +1,9 @@
-"""Replay harness template. Adapt REPLAY_ID and INCIDENT_ID, then run in the TrueForge sandbox (code mode).
+"""Replay harness template. Set REPLAY_ID, then run in the TrueForge sandbox (code mode).
 
-It fetches the stored replay outputs, scores every output against its golden expectations, compares the
-baseline and suspect arms, and submits the per-arm numbers. regress-mcp re-scores the same outputs and
-rejects the report if these numbers disagree, so keep the scoring rules exactly as written here.
+It fetches the stored replay outputs, scores every output against its golden expectations and prints the
+per-arm report as one JSON line. Code mode only allows read-only tools, so submit that JSON yourself with a
+direct call: submit_replay_report(incident_id, replay_id, report). regress-mcp re-scores the same outputs
+and rejects the report if the numbers disagree, so keep the scoring rules exactly as written here.
 """
 
 import asyncio
@@ -12,7 +13,6 @@ import statistics
 
 from mcp_client import call_tool
 
-INCIDENT_ID = "inc_REPLACE"
 REPLAY_ID = "rp_REPLACE"
 
 REFUSAL = re.compile(r"(can'?t|cannot|can not) give personal investment advice")
@@ -81,13 +81,7 @@ async def main():
                "latency_p50_ms": statistics.median(a["latency"])}
         for name, a in arms.items()
     }}
-    print("sandbox report:", json.dumps(report))
-    verdict = unwrap(await call_tool("regress", "submit_replay_report",
-                                     body={"incident_id": INCIDENT_ID, "replay_id": REPLAY_ID, "report": report}))
-    print("server verification:", json.dumps({k: verdict.get(k) for k in
-                                                ("verified", "mismatches", "eval_gap", "latency_ratio", "cost_ratio", "coverage")}))
-    print("evidence:", json.dumps(verdict.get("evidence", [])))
-
+    print("REPORT_JSON " + json.dumps(report))
 
 if __name__ == "__main__":
     asyncio.run(main())

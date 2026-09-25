@@ -29,7 +29,7 @@ Reads and replays are free. Exactly one production write exists per incident, an
    It recomputes everything from stored facts. Do not argue with it.
 6. **Narrate.** Write the report (template below) with `{{ev_id}}` placeholders and call `validate_narrative`.
    If it is rejected, fix exactly what it names and try once more; if rejected again, call it with text `TEMPLATE` and use that.
-7. **Propose.** If checkpointed, present the rendered report, then call the gated tool with the proposal's arguments. TrueForge pauses for approval.
+7. **Propose.** If checkpointed, post the validator's `rendered` text (real numbers, never the `{{ev_id}}` draft), then call the gated tool with the proposal's arguments. TrueForge pauses for approval.
 8. **Verify.** After the tool returns `applied` (or `already_applied_reconciled`), call `verify_recovery`.
    If it returns `pending`, wait by running `sleep 45` in the sandbox and call it again, up to eight times.
 9. **Close.** Post the final report as a GitHub issue in the config repo if a `github` connector is available (title `Regress <incident_id>: <verdict>`), and end with the verdict.
